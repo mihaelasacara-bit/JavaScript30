@@ -25,10 +25,14 @@ body {
   transition: transform 0.5s;
 }
 
+.fixed-nav .site-wrap {
+  transform: scale(1);
+}
+
 header {
   text-align: center;
   height: 500px;
-  background: url(https://source.unsplash.com/GKN6rpDr0EI/960x640) bottom center no-repeat;
+  background: url(https://images.unsplash.com/photo-1787209221424-2e01ea79b53e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D) bottom center no-repeat;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -48,6 +52,11 @@ nav {
   transition: all 0.5s;
   position: relative;
   z-index: 1;
+}
+
+.fixed-nav nav {
+  position: fixed; /*fixed elements no longer take up space on the page*/
+  box-shadow: 0 5px rgba(0, 0, 0, 0.1);
 }
 
 nav ul {
@@ -72,6 +81,10 @@ li.logo {
   transition: all .5s;
   font-weight: 600;
   font-size: 30px;
+}
+
+.fixed-nav li.logo {
+  max-width: 500px; /*you cannot animate width auto*/
 }
 
 li.logo a {
