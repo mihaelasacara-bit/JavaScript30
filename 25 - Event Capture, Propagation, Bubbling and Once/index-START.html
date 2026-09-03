@@ -41,8 +41,27 @@
   }
 </style>
 
+<button></button>
 <script>
+  const divs = document.querySelectorAll('div');
+  const button = document.querySelector('button');
 
+  function logText(e) {
+    console.log(this.classList.value);
+    // e.stopPropagation(); // stop bubbling
+  }
+
+
+  divs.forEach(div => div.addEventListener('click', logText, {
+    // capture: true // firing on the way down, rather than on the way up; default is false
+    once: true // listen for a click once, then unbinds itself
+  }));
+
+  button.addEventListener('click', () => {
+    console.log('Click!');
+  }, {
+    once: true
+  });
 </script>
 </body>
 </html>
