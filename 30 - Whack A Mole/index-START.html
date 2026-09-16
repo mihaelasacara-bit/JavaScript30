@@ -15,7 +15,12 @@
       <h1 >Whack-a-carrot!</h1>
       <div class="scoreboard"><span class="score">00</span></div>
     </div>
-    <button onClick="startGame()">Start!</button>
+    <div class="middle-row">
+      <button data-mode="easy">Easy</button>
+      <button data-mode="normal" class="normal selected">Normal</button>
+      <button data-mode="hard">Hard</button>
+    </div>
+    <button class="start-button" onClick="startGame()">Start!</button>
   </div>
 
   <div class="game">
@@ -39,10 +44,30 @@
     </div>
   </div>
 
+  <div class="leaderboard">
+    <h2>Leaderboard</h2>
+    <div class="leaderboard-columns">
+      <div>
+        <h3>Easy</h3>
+        <ol id="leaderboard-easy"></ol>
+      </div>
+      <div>
+        <h3>Normal</h3>
+        <ol id="leaderboard-normal"></ol>
+      </div>
+      <div>
+        <h3>Hard</h3>
+        <ol id="leaderboard-hard"></ol>
+      </div>
+    </div>
+  </div>
+
 <script>
   const holes = document.querySelectorAll('.hole');
   const scoreBoard = document.querySelector('.score');
   const carrots = document.querySelectorAll('.carrot');
+  const modes = document.querySelectorAll('.middle-row button')
+  let selectedMode = 'normal';
   let lastHole;
   let timeUp = true;
   let score = 0;
@@ -63,7 +88,13 @@
   }
 
   function peep() {
-    const time = randTime(200, 1000);
+    const speeds = {
+      easy: [600, 1200],
+      normal: [400, 1000],
+      hard: [200, 600]
+    };
+    const [min, max] = speeds[selectedMode];
+    const time = randTime(min, max);
     const hole = randHole(holes);
     hole.classList.add('up');
     setTimeout(() => {
@@ -79,7 +110,11 @@
     score = 0;
 
     peep();
-    setTimeout(() => timeUp = true, 10000);
+    setTimeout(() => {
+      timeUp = true;
+      saveScore(selectedMode, score);
+      renderLeaderboard();
+    }, 10000);
   }
 
   function bonk(e) {
@@ -89,8 +124,43 @@
     scoreBoard.textContent = score < 10 ? `0${score}` : `${score}`;
   }
 
-  carrots.forEach(carrot => carrot.addEventListener('click', bonk));
+  function setMode() {
+    document.querySelector('.middle-row .selected').classList.remove('selected');
+    this.classList.add('selected');
+    selectedMode = this.dataset.mode;
+  }
 
+  renderLeaderboard();
+  carrots.forEach(carrot => carrot.addEventListener('click', bonk));
+  modes.forEach(modeBtn => modeBtn.addEventListener('click', setMode));
+
+  function getLeaderboard() {
+    const stored = localStorage.getItem('leaderboard');
+    return stored ? JSON.parse(stored) : { easy: [], normal: [], hard: [] };
+  }
+
+  function saveScore(mode, newScore) {
+    const leaderboard = getLeaderboard();
+    leaderboard[mode].push(newScore);
+    leaderboard[mode].sort((a, b) => b - a); // highest first
+    leaderboard[mode] = leaderboard[mode].slice(0, 5); // keep top 5 only
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+  }
+
+  function renderLeaderboard() {
+    const leaderboard = getLeaderboard();
+
+    ['easy', 'normal', 'hard'].forEach(mode => {
+      const list = document.getElementById(`leaderboard-${mode}`);
+      list.innerHTML = ''; // clear old entries before re-rendering
+
+      leaderboard[mode].forEach(score => {
+        const li = document.createElement('li');
+        li.textContent = score;
+        list.appendChild(li);
+      });
+    });
+  }
 </script>
 </body>
 </html>
