@@ -103,6 +103,13 @@
     }, time);
   }
 
+  function endRound() {
+    timeUp = true;
+    holes.forEach(hole => hole.classList.remove('up'));
+    if (score > 0) saveScore(selectedMode, score);
+    renderLeaderboard();
+  }
+
   function startGame() {
     if (!timeUp) return;
     scoreBoard.textContent = `00`;
@@ -110,15 +117,12 @@
     score = 0;
 
     peep();
-    setTimeout(() => {
-      timeUp = true;
-      saveScore(selectedMode, score);
-      renderLeaderboard();
-    }, 10000);
+    setTimeout(endRound, 10000);
   }
 
   function bonk(e) {
     if(!e.isTrusted) return; //fake click without mouse
+    if(timeUp) return;
     score++;
     this.classList.remove('up');
     scoreBoard.textContent = score < 10 ? `0${score}` : `${score}`;
@@ -157,7 +161,7 @@
       leaderboard[mode].forEach(score => {
         const li = document.createElement('li');
         li.textContent = score;
-        list.appendChild(li);
+        if(score > 0) list.appendChild(li);
       });
     });
   }
